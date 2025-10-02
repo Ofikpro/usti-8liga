@@ -176,19 +176,34 @@ function getNextFixture(){
 }
 function startCountdown(){
   const next = getNextFixture();
-  const el = document.getElementById('countdown');
   const info = document.getElementById('nextInfo');
-  if(!next){ info.textContent = 'Žádný další zápas'; return; }
+  if(!next){ 
+    info.textContent = 'Žádný další zápas'; 
+    return; 
+  }
+
   const label = `${clubName(next.home)} vs ${clubName(next.away)} • ${new Date(next.date).toLocaleString('cs-CZ',{weekday:'short', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})}`;
   info.innerHTML = `Nejbližší výkop: <b>${label}</b> • zbývá <span class="countdown" id="countdown"></span>`;
+
   function tick(){
     const diff = new Date(next.date) - new Date();
-    if(diff<=0){ el.textContent = "0d 00:00:00"; return; }
-    const s = Math.floor(diff/1000), d = Math.floor(s/86400), h = Math.floor((s%86400)/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    const el = document.getElementById('countdown'); // vždy znovu vezme aktuální span
+    if(!el) return;
+    if(diff <= 0){ 
+      el.textContent = "0d 00:00:00"; 
+      return; 
+    }
+    const s = Math.floor(diff/1000);
+    const d = Math.floor(s/86400);
+    const h = Math.floor((s%86400)/3600);
+    const m = Math.floor((s%3600)/60);
+    const sec = s%60;
     el.textContent = `${d}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
   }
-  tick(); setInterval(tick, 1000);
+  tick();
+  setInterval(tick, 1000);
 }
+
 startCountdown();
 /* === /countdown === */
 
