@@ -361,5 +361,21 @@ function resetAll(){ if(confirm('Smazat lokální data?')){ localStorage.removeI
 function switchView(view){ state.view=view; viewEl.style.opacity=0; setTimeout(()=>{ render(); viewEl.style.opacity=1; viewEl.classList.remove('view'); void viewEl.offsetWidth; viewEl.classList.add('view'); }, 120); }
 function toast(msg){ const old=document.querySelector('.hint'); if(old) old.remove(); const el=document.createElement('div'); el.className='hint'; el.textContent=msg; document.body.appendChild(el); setTimeout(()=>el.remove(), 2000); }
 </script>
+  <!-- Tiket tlačítko -->
+<button class="tiket-btn" onclick="toggleTiket()">🎫 Tiket</button>
+
+<!-- Tiket okno -->
+<div class="tiket hidden" id="tiketBox">
+  <h4>Můj tiket</h4>
+  <div id="tiketContent">
+    <small>Zatím nic nevsazeno.</small>
+  </div>
+</div>
+
+<script>
+  function toggleTiket(){
+    document.getElementById('tiketBox').classList.toggle('hidden');
+  }
+</script>
 </body>
 </html>
