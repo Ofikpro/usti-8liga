@@ -34,6 +34,20 @@
     /* sticky CTA */
     .sticky{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:20;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border:none;border-radius:999px;padding:12px 18px;box-shadow:0 14px 34px rgba(91,134,255,.35);cursor:pointer}
     .countdown{font-weight:700;letter-spacing:.3px}
+    <style>
+  ... (tvůj existující CSS kód)
+
+  /* --- Ticket (tiket) --- */
+  .tiket-btn{position:fixed;right:16px;bottom:16px;z-index:50;border:none;border-radius:999px;padding:12px 16px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 14px 34px rgba(91,134,255,.35);cursor:pointer}
+  .tiket{position:fixed;right:16px;bottom:76px;width:320px;max-height:70vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.35);padding:12px;z-index:50}
+  .tiket.hidden{display:none}
+  .tiket h4{margin:6px 0 8px}
+  .tiket .rowx{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .tiket .pick{border:1px solid var(--border);border-radius:10px;padding:8px;margin:6px 0}
+  .tiket small{color:var(--muted)}
+  .odds{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .odds .btn{padding:8px 10px;border-radius:10px}
+  .badge-num{background:#0002;border:1px solid #ffffff33;padding:2px 8px;border-radius:999px;margin-left:8px}
   </style>
 </head>
 <body>
