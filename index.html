@@ -385,5 +385,30 @@ function toast(msg){ const old=document.querySelector('.hint'); if(old) old.remo
     document.getElementById('tiketBox').classList.toggle('hidden');
   }
 </script>
+  <button class="tiket-btn" id="openTiket">
+  🎟️ Tiket <span class="badge-num" id="tiketCount">0</span>
+</button>
+
+<div class="tiket hidden" id="tiketBox">
+  <h4>🎟️ Můj tiket</h4>
+  <div id="tiketList"></div>
+  <div class="rowx" style="margin-top:8px">
+    <small>Součin kurzů:</small><b id="tiketOdds">1.00</b>
+  </div>
+  <div class="rowx" style="margin-top:6px">
+    <small>Vklad (body):</small>
+    <input id="tiketStake" type="number" min="0" value="50"
+      style="width:110px;padding:6px;border-radius:8px;border:1px solid var(--border);background:#0f1122;color:#fff">
+  </div>
+  <div class="rowx" style="margin-top:6px">
+    <small>Možná výhra:</small><b id="tiketWin">50.00</b>
+  </div>
+  <div class="rowx" style="margin-top:10px">
+    <button class="btn" onclick="clearTiket()">Vymazat</button>
+    <button class="btn primary" onclick="toast('Demo: tiket uložen lokálně ✅')">Vsadit (demo)</button>
+  </div>
+  <small>⚠️ Demo, žádné reálné sázení.</small>
+</div>
+  
 </body>
 </html>
