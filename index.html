@@ -256,32 +256,35 @@ function render(){
 
 function clubName(id){ return state.data.clubs.find(c=>c.id===id)?.name || '—'; }
 
-renderMatches = function(){
+const renderMatches = () => {
   const d = state.data;
-  const rounds = [...new Set(d.fixtures.map(x=>x.round))].sort((a,b)=>a-b);
+  const rounds = [...new Set(d.fixtures.map(x => x.round))].sort((a, b) => a - b);
 
-  viewEl.innerHTML = rounds.map(r=>{
-    const ms = d.fixtures.filter(x=>x.round===r);
-    const list = ms.map(m=>{
+  viewEl.innerHTML = rounds.map(r => {
+    const ms = d.fixtures.filter(x => x.round === r);
+    const list = ms.map(m => {
       const home = clubName(m.home), away = clubName(m.away);
-      const dt   = new Date(m.date).toLocaleString('cs-CZ',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-      const oh   = m.odds?.home ?? 1.85, oa = m.odds?.away ?? 1.85;
+      const dt = new Date(m.date).toLocaleString('cs-CZ', {
+        weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+      });
+      const oh = m.odds?.home ?? 1.85, oa = m.odds?.away ?? 1.85;
 
       return `
       <section class="card view" id="${m.id}">
         <div class="row"><strong>${home} vs ${away}</strong><span class="badge">${r}. kolo</span></div>
-        <div class="small">${dt} • ${m.venue||''}</div>
-
+        <div class="small">${dt} • ${m.venue || ''}</div>
         <div class="odds">
           <button class="btn" onclick="addPick('${m.id}','home')">Vyhraje ${home} • ${oh.toFixed(2)}</button>
           <button class="btn" onclick="addPick('${m.id}','away')">Vyhraje ${away} • ${oa.toFixed(2)}</button>
-          <button class="btn" onclick="navigator.clipboard?.writeText(location.origin+location.pathname+'#${m.id}')">Sdílet</button>
+          <button class="btn" onclick="navigator.clipboard?.writeText(location.origin + location.pathname + '#${m.id}')">Sdílet</button>
         </div>
       </section>`;
     }).join('');
+
     return `<h3 style="margin-top:8px">${r}. kolo</h3>` + list;
   }).join('');
 };
+
 
 
 function renderTips(){
