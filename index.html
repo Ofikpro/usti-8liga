@@ -256,28 +256,33 @@ function render(){
 
 function clubName(id){ return state.data.clubs.find(c=>c.id===id)?.name || '—'; }
 
-function renderMatches(){
+renderMatches = function(){
   const d = state.data;
   const rounds = [...new Set(d.fixtures.map(x=>x.round))].sort((a,b)=>a-b);
-  const next = getNextFixture()?.id;
+
   viewEl.innerHTML = rounds.map(r=>{
     const ms = d.fixtures.filter(x=>x.round===r);
     const list = ms.map(m=>{
       const home = clubName(m.home), away = clubName(m.away);
-      const dt = new Date(m.date).toLocaleString('cs-CZ',{weekday:'short',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'});
+      const dt   = new Date(m.date).toLocaleString('cs-CZ',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const oh   = m.odds?.home ?? 1.85, oa = m.odds?.away ?? 1.85;
+
       return `
       <section class="card view" id="${m.id}">
         <div class="row"><strong>${home} vs ${away}</strong><span class="badge">${r}. kolo</span></div>
-        <div class="small">${dt} • ${m.venue}</div>
-        <div class="row" style="margin-top:10px">
-          <button class="btn" data-mid="${m.id}" onclick="openTip('${m.id}')">${m.id===next?'Tipnout (nejbližší)':'Tipnout výsledek'}</button>
+        <div class="small">${dt} • ${m.venue||''}</div>
+
+        <div class="odds">
+          <button class="btn" onclick="addPick('${m.id}','home')">Vyhraje ${home} • ${oh.toFixed(2)}</button>
+          <button class="btn" onclick="addPick('${m.id}','away')">Vyhraje ${away} • ${oa.toFixed(2)}</button>
           <button class="btn" onclick="navigator.clipboard?.writeText(location.origin+location.pathname+'#${m.id}')">Sdílet</button>
         </div>
       </section>`;
     }).join('');
     return `<h3 style="margin-top:8px">${r}. kolo</h3>` + list;
   }).join('');
-}
+};
+
 
 function renderTips(){
   const d = state.data;
@@ -367,6 +372,77 @@ function saveProfile(){ state.profile.nick = document.getElementById('nick').val
 function resetAll(){ if(confirm('Smazat lokální data?')){ localStorage.removeItem('tips_landing'); localStorage.removeItem('profile_landing'); state.tips={}; state.profile={nick:'Jarda',favClub:'van'}; renderProfile(); toast('Reset hotov'); } }
 function switchView(view){ state.view=view; viewEl.style.opacity=0; setTimeout(()=>{ render(); viewEl.style.opacity=1; viewEl.classList.remove('view'); void viewEl.offsetWidth; viewEl.classList.add('view'); }, 120); }
 function toast(msg){ const old=document.querySelector('.hint'); if(old) old.remove(); const el=document.createElement('div'); el.className='hint'; el.textContent=msg; document.body.appendChild(el); setTimeout(()=>el.remove(), 2000); }
+  <script>
+// ====== Tiket – jednoduché jádro ======
+const TICKET_KEY = 'tiket_demo_v1';
+let tiket = JSON.parse(localStorage.getItem(TICKET_KEY) || '[]');
+
+function saveTiket(){ localStorage.setItem(TICKET_KEY, JSON.stringify(tiket)); }
+function totalOdds(){ return tiket.reduce((acc,p)=>acc * Number(p.odds||1), 1) || 1; }
+
+function renderTiket(){
+  const list = document.getElementById('tiketList');
+  const count = document.getElementById('tiketCount');
+  const oddsEl = document.getElementById('tiketOdds');
+  const winEl  = document.getElementById('tiketWin');
+  const stakeEl= document.getElementById('tiketStake');
+  if(!list) return;
+
+  list.innerHTML = tiket.map(p=>`
+    <div class="pick">
+      <div class="rowx">
+        <b>${p.label}</b>
+        <button class="btn" onclick="removePick('${p.mid}')">✖</button>
+      </div>
+      <small>${p.when} • kurz ${Number(p.odds).toFixed(2)}</small>
+    </div>
+  `).join('') || '<small>Nic na tiketu.</small>';
+
+  const sum = totalOdds();
+  oddsEl.textContent = sum.toFixed(2);
+  const stake = Number(stakeEl?.value || 0);
+  if(winEl) winEl.textContent = (stake * sum).toFixed(2);
+  if(count) count.textContent = tiket.length;
+}
+
+function toggleTiket(){
+  document.getElementById('tiketBox').classList.toggle('hidden');
+  renderTiket();
+}
+
+function removePick(mid){
+  tiket = tiket.filter(p=>p.mid !== mid);
+  saveTiket(); renderTiket();
+}
+
+function clearTiket(){
+  tiket = []; saveTiket(); renderTiket();
+}
+
+function addPick(mid, side){ // side: 'home' | 'away'
+  // očekává DATA/ state.data.fixtures s odds:{home,away}
+  const fixtures = (window.state?.data?.fixtures) || (window.DATA?.fixtures) || [];
+  const m = fixtures.find(x=>x.id === mid);
+  if(!m){ (window.toast||alert)('Zápas nenalezen'); return; }
+
+  const team = side === 'home' ? clubName(m.home) : clubName(m.away);
+  const odds = side === 'home' ? (m.odds?.home ?? 1.85) : (m.odds?.away ?? 1.85);
+  const when = new Date(m.date).toLocaleString('cs-CZ', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+
+  // v tiketu jen jeden pick na jeden zápas -> přepiš
+  tiket = tiket.filter(p=>p.mid !== mid);
+  tiket.push({ mid, side, odds, label:`${team} vyhraje`, when });
+
+  saveTiket(); renderTiket();
+  (window.toast||console.log)('Přidáno na tiket ✅');
+}
+
+// ovládání
+document.getElementById('openTiket')?.addEventListener('click', toggleTiket);
+document.getElementById('tiketStake')?.addEventListener('input', renderTiket);
+
+// inicializace
+renderTiket();
 </script>
   
   <!-- Tiket tlačítko -->
